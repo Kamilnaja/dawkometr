@@ -1,10 +1,12 @@
-import { Button } from "@chakra-ui/react";
+import { TopMenu } from "./_components/top-menu";
 
 export default function Home() {
   return (
-    <main>
-      <Button size={"xs"}>Chackra</Button>
-      <h1>Dawkometr</h1>
-    </main>
+    <>
+      <TopMenu />
+      <main>
+        <h1>Dawkometr</h1>
+      </main>
+    </>
   );
 }
