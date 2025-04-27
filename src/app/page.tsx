@@ -1,11 +1,12 @@
-import { TopMenu } from "./_components/top-menu";
+import { Sidebar } from "./_components/sidebar";
 
-export default function Home() {
+export default function Home({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <TopMenu />
       <main>
-        <h1>Dawkometr</h1>
+        <Sidebar />
+        <h1>Dawkometr🧪</h1>
+        {children}
       </main>
     </>
   );

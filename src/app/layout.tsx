@@ -1,5 +1,7 @@
 import { Provider } from "@/components/ui/provider";
 import type { Metadata } from "next";
+import { Sidebar } from "./_components/sidebar";
+import { TopMenu } from "./_components/top-menu";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +17,13 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning>
       <body>
-        <Provider>{children}</Provider>
+        <Provider>
+          <TopMenu />
+          <div style={{ display: "flex" }}>
+            <Sidebar />
+            <main style={{ flexGrow: 1 }}>{children}</main>
+          </div>
+        </Provider>
       </body>
     </html>
   );
