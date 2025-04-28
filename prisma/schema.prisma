@@ -11,17 +11,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-    id        String   @id @default(cuid())
-    name      String
-    email     String   @unique
-    Visit Visit[]
+enum RadiationUnit {
+  mSv
+  mGy
 }
 
-model Visit {
-    id        String   @id @default(cuid())
-    userId    String
-    user      User     @relation(fields: [userId], references: [id])
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Patient {
+  id                  Int                   @id @default(autoincrement())
+  firstName           String
+  lastName            String
+  dateOfBirth         DateTime
+  nationalId          String?               @unique
+  appointments        Appointment[]         // all booked exams
+  radiationExposures  RadiationExposure[]   // all dose records
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+}
+
+model RadiographyCabinet {
+  id            Int           @id @default(autoincrement())
+  name          String        @unique
+  location      String?
+  appointments  Appointment[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model RadiographyType {
+  id               Int           @id @default(autoincrement())
+  name             String        @unique         // e.g. "Chest X-Ray", "CT Head"
+  description      String?
+  typicalDose      Float?        // optional baseline dose in default unit
+  defaultUnit      RadiationUnit @default(mSv)
+  appointments     Appointment[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model Appointment {
+  id                   Int                   @id @default(autoincrement())
+  patient              Patient               @relation(fields: [patientId], references: [id])
+  patientId            Int
+  cabinet              RadiographyCabinet    @relation(fields: [cabinetId], references: [id])
+  cabinetId            Int
+  radiographyType      RadiographyType       @relation(fields: [radiographyTypeId], references: [id])
+  radiographyTypeId    Int
+  scheduledAt          DateTime
+  performedAt          DateTime?
+  notes                String?
+  exposure             RadiationExposure?    // one-to-one: the actual dose measured
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+
+  @@index([patientId, scheduledAt])
+  @@index([cabinetId, scheduledAt])
+}
+
+model RadiationExposure {
+  id              Int             @id @default(autoincrement())
+  appointment     Appointment     @relation(fields: [appointmentId], references: [id])
+  appointmentId   Int             @unique          // one exposure per appointment
+  dose            Float            // amount of radiation
+  unit            RadiationUnit    // unit of the measurement
+  measuredAt      DateTime         @default(now())
+  notes           String?
+
+  @@index([measuredAt])
+  Patient Patient[]
 }
